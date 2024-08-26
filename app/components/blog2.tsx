@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
+import Link from 'next/link'
 
 interface Blog {
   _id: string;
@@ -12,7 +13,7 @@ interface Blog {
   category: { _id: string; title: string } | string;
   createdAt: string;
   excerpt: string;
-  username: string;
+  user: { username: string };
 }
 
 export default function BlogPage() {
@@ -106,10 +107,12 @@ export default function BlogPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-4">{blog.excerpt}</p>
-                <Button variant="outline">Read More</Button>
+                <Link href={`/${blog._id}/blog`} passHref>
+                  <Button variant="outline">Read More</Button>
+                </Link>
               </CardContent>
               <CardFooter className="flex justify-between items-center">
-                <p className="text-sm text-muted-foreground">By {blog.username}</p>
+                <p className="text-sm text-muted-foreground">By {blog.user.username}</p>
                 <p className="text-sm text-muted-foreground">{new Date(blog.createdAt).toLocaleDateString()}</p>
               </CardFooter>
             </Card>

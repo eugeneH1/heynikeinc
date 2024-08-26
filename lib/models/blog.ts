@@ -1,5 +1,20 @@
 import { Schema, model, models } from "mongoose";
 
+const CommentSchema = new Schema({
+    author: {
+        type: String,
+        required: [true, "Author is required"],
+    },
+    content: {
+        type: String,
+        required: [true, "Comment content is required"],
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
+});
+
 const BlogSchema = new Schema({
     title: {
         type: String,
@@ -23,11 +38,15 @@ const BlogSchema = new Schema({
         ref: "User",
         required: [true, "User is required"],
     },
+    likes: {
+        type: Number,
+        default: 0,
+    },
+    comments: [CommentSchema],
     date: {
         type: Date,
         default: Date.now,
     },
-    
 }, {timestamps: true});
 
 const Blog = models.Blog || model("Blog", BlogSchema);

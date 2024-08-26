@@ -1,46 +1,127 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Heart } from "lucide-react"
+import { useParams } from 'next/navigation'
 
-export default function Component() {
-  const [likes, setLikes] = useState(0)
-  const [comments, setComments] = useState([
-    { id: 1, author: 'John Doe', content: 'Great article! Very informative.' },
-    { id: 2, author: 'Jane Smith', content: 'I learned a lot from this. Thanks for sharing!' }
-  ])
+interface Blog {
+  _id: string;
+  title: string;
+  description: string;
+  content: string;
+  category: { _id: string; title: string } | string;
+  createdAt: string;
+  user: { _id: string; username: string };
+  likes: number;
+  comments: Comment[];
+}
+
+interface Comment {
+  _id: string;
+  author: string;
+  content: string;
+  createdAt: string;
+}
+
+export default function BlogPost() {
+  const [blog, setBlog] = useState<Blog | null>(null)
   const [newComment, setNewComment] = useState('')
   const [commentAuthor, setCommentAuthor] = useState('')
+  const params = useParams()
+  const blogId = params.blog as string
 
-  const handleLike = () => {
-    setLikes(likes + 1)
+  useEffect(() => {
+    const fetchBlog = async () => {
+      try {
+        const response = await fetch(`/api/blogs/${blogId}`)
+        if (response.ok) {
+          const data = await response.json()
+          setBlog(data.blog)
+        } else {
+          console.error('Failed to fetch blog:', response.status, response.statusText)
+        }
+      } catch (error) {
+        console.error('Error fetching blog:', error)
+      }
+    }
+
+    if (blogId) {
+      fetchBlog()
+    }
+  }, [blogId])
+
+  const handleLike = async () => {
+    if (!blog) return
+
+    try {
+      const response = await fetch(`/api/blogs/${blogId}/like`, {
+        method: 'POST',
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setBlog({ ...blog, likes: data.likes })
+      } else {
+        console.error('Failed to like blog:', response.status, response.statusText)
+      }
+    } catch (error) {
+      console.error('Error liking blog:', error)
+    }
   }
 
-  const handleCommentSubmit = (e: React.FormEvent) => {
+  const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (newComment.trim() && commentAuthor.trim()) {
-      setComments([
-        ...comments,
-        { id: comments.length + 1, author: commentAuthor, content: newComment }
-      ])
-      setNewComment('')
-      setCommentAuthor('')
+    if (!blog || !newComment.trim() || !commentAuthor.trim()) return
+
+    try {
+      const response = await fetch(`/api/blogs/${blogId}/comment`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ author: commentAuthor, content: newComment }),
+      })
+      if (response.ok) {
+        const data = await response.json()
+        console.log('Comment response:', data)
+        if (data.comment) {
+          setBlog(prevBlog => ({
+            ...prevBlog!,
+            comments: [...prevBlog!.comments, data.comment],
+          }))
+          setNewComment('')
+          setCommentAuthor('')
+        } else {
+          console.error('Comment data is missing in the response')
+        }
+      } else {
+        const errorData = await response.json()
+        console.error('Failed to add comment:', response.status, response.statusText, errorData)
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error)
     }
+  }
+
+  if (!blog) {
+    return <div>Loading...</div>
   }
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-8">
       <article className="prose dark:prose-invert lg:prose-xl">
-        <h1 className="text-3xl font-bold">The Future of Artificial Intelligence</h1>
-        <p className="text-xl text-muted-foreground">Exploring the potential impact of AI on various industries and our daily lives.</p>
+        <h1 className="text-3xl font-bold">{blog.title}</h1>
+        <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+          <span>By {blog.user.username}</span>
+          <span>•</span>
+          <span>{new Date(blog.createdAt).toLocaleDateString()}</span>
+        </div>
+        <p className="text-xl text-muted-foreground">{blog.description}</p>
         <div className="mt-4">
-          <p>Artificial Intelligence (AI) is rapidly evolving and its influence is being felt across numerous sectors. From healthcare to finance, transportation to entertainment, AI is revolutionizing the way we live and work.</p>
-          <p>In this article, we'll delve into the current state of AI technology, its potential future developments, and the ethical considerations we must address as we move forward in this exciting field.</p>
-          {/* Add more paragraphs as needed */}
+          <div dangerouslySetInnerHTML={{ __html: blog.content }} />
         </div>
       </article>
 
@@ -49,7 +130,7 @@ export default function Component() {
           <Heart className="mr-2 h-4 w-4" />
           Like
         </Button>
-        <span className="text-sm text-muted-foreground">{likes} likes</span>
+        <span className="text-sm text-muted-foreground">{blog.likes} likes</span>
       </div>
 
       <div className="space-y-4">
@@ -68,14 +149,15 @@ export default function Component() {
           <Button type="submit">Post Comment</Button>
         </form>
         <div className="space-y-4">
-          {comments.map((comment) => (
-            <div key={comment.id} className="flex space-x-4 items-start">
+          {blog.comments.map((comment) => (
+            <div key={comment._id} className="flex space-x-4 items-start">
               <Avatar>
                 <AvatarFallback>{comment.author[0]}</AvatarFallback>
               </Avatar>
               <div className="space-y-1">
                 <p className="text-sm font-medium">{comment.author}</p>
                 <p className="text-sm text-muted-foreground">{comment.content}</p>
+                <p className="text-xs text-muted-foreground">{new Date(comment.createdAt).toLocaleString()}</p>
               </div>
             </div>
           ))}
