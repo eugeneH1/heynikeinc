@@ -1,24 +1,10 @@
 import { NextResponse } from "next/server";
-import { authMiddleware } from "./middleware/api/authMiddleware";
-import { logMiddleware } from "./middleware/api/logMiddleware";
-
 
 export const config = {
-    matcher: ["/api/:path*"],
+    matcher: [], // Empty matcher to disable middleware for all routes
 };
 
 export default function middleware(request: Request) {
-    if(request.url.includes("/api/blogs")) {
-        const logResult = logMiddleware(request);
-        console.log("logResult", logResult.response);
-    }
-
-    const authResults = authMiddleware(request);
-    console.log("authResults.isValid", authResults?.isValid);
-
-    if (!authResults?.isValid) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-    }
-    
+    // Allow all requests to proceed without any interception
     return NextResponse.next();
 }

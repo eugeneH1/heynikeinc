@@ -11,6 +11,7 @@ export async function POST(request: NextRequest) {
   try {
     await connect();
     const { email, password } = await request.json();
+    console.log(email, password);
 
     const user = await User.findOne({ email });
 

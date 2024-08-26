@@ -8,8 +8,8 @@ import Blog from "@/lib/models/blog";
 export const GET = async (request: NextRequest) => {
     try {
         const { searchParams } = new URL(request.url);
-        const userId = searchParams.get("userId");
-        const categoryId = searchParams.get("categoryId");
+        // const userId = searchParams.get("userId");
+        // const categoryId = searchParams.get("categoryId");
         const searchKeywords = searchParams.get("keywords") as string;
         const startDate = searchParams.get("startDate") as string;
         const endDate = searchParams.get("endDate") as string;
@@ -19,29 +19,30 @@ export const GET = async (request: NextRequest) => {
 
         if(!sort) sort = "desc";
 
-        if(!userId || !Types.ObjectId.isValid(userId)) {
-            return NextResponse.json({ message: "Invalid or missing user ID" }, { status: 400 });
-        }
-        if(!categoryId || !Types.ObjectId.isValid(categoryId)) {
-            return NextResponse.json({ message: "Invalid or missing category ID" }, { status: 400 });
-        }
+        // if(!userId || !Types.ObjectId.isValid(userId)) {
+        //     return NextResponse.json({ message: "Invalid or missing user ID" }, { status: 400 });
+        // }
+        // if(!categoryId || !Types.ObjectId.isValid(categoryId)) {
+        //     return NextResponse.json({ message: "Invalid or missing category ID" }, { status: 400 });
+        // }
 
         await connect();
 
-        const user = await User.findById(userId);
-        if(!user) {
-            return NextResponse.json({ message: "User not found" }, { status: 404 });
-        }
+        // const user = await User.findById(userId);
+        // if(!user) {
+        //     return NextResponse.json({ message: "User not found" }, { status: 404 });
+        // }
 
-        const category = await Category.findById(categoryId);
-        if(!category) {
-            return NextResponse.json({ message: "Category not found" }, { status: 404 });
-        }
+        // const category = await Category.findById(categoryId);
+        // if(!category) {
+        //     return NextResponse.json({ message: "Category not found" }, { status: 404 });
+        // }
 
-        const filter: any = {
-            user: new Types.ObjectId(userId),
-            category: new Types.ObjectId(categoryId),
-        };
+        // const filter: any = {
+        //     user: new Types.ObjectId(userId),
+        //     category: new Types.ObjectId(categoryId),
+        // };
+        const filter: any = {};
 
         if(searchKeywords) {
             filter.$or = [
@@ -63,7 +64,7 @@ export const GET = async (request: NextRequest) => {
 
         // TODO: add more filters
 
-        const blogs = await Blog.find(filter).sort({ createdAt: sort === "asc" ? 1 : -1 }).skip(skip).limit(Number(limit));
+        const blogs = await Blog.find(filter).populate('category', 'title').populate('user', 'username').sort({ createdAt: sort === "asc" ? 1 : -1 }).skip(skip).limit(Number(limit));
 
         return NextResponse.json({ blogs }, { status: 200 });
     } catch (error) {
@@ -74,18 +75,12 @@ export const GET = async (request: NextRequest) => {
 
 export const POST = async (request: NextRequest) => {
     try {
-        const searchParams = new URL(request.url).searchParams;
-        const userId = searchParams.get("userId");
-        const categoryId = searchParams.get("categoryId");
-
         const body = await request.json();
-        const { title, description, content } = body;
+        console.log("body: ", body)
+        const { title, description, content, category, userId } = body;
 
         if(!userId || !Types.ObjectId.isValid(userId)) {
             return NextResponse.json({ message: "Invalid or missing user ID" }, { status: 400 });
-        }
-        if(!categoryId || !Types.ObjectId.isValid(categoryId)) {
-            return NextResponse.json({ message: "Invalid or missing category ID" }, { status: 400 });
         }
 
         await connect();
@@ -95,28 +90,25 @@ export const POST = async (request: NextRequest) => {
             return NextResponse.json({ message: "User not found" }, { status: 404 });
         }
 
-        const category = await Category.findById(categoryId);
-        if(!category) {
+        const categoryDoc = await Category.findById(category);
+        if(!categoryDoc) {
             return NextResponse.json({ message: "Category not found" }, { status: 404 });
         }
-        // console.log("category: ", category)
-        // console.log("userId: ", userId)
-        // console.log("description", description)
 
         const blog = new Blog({
             title,
             description,
+            content,
             user: new Types.ObjectId(userId),
-            category: new Types.ObjectId(categoryId),
-            content: content,
+            category: new Types.ObjectId(category),
         });
-        console.log("blog: ", blog)
+
         await blog.save();
 
-        return NextResponse.json({ message: "Blog created successfully" }, { status: 201 });
+        return NextResponse.json({ message: "Blog created successfully", blog }, { status: 201 });
     } catch (error) {
         console.log("error: ", error)
-        return NextResponse.json({ message: "Error connecting to database" }, { status: 500 });
+        return NextResponse.json({ message: "Error creating blog" }, { status: 500 });
     }
 }
 

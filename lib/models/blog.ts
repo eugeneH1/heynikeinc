@@ -23,6 +23,11 @@ const BlogSchema = new Schema({
         ref: "User",
         required: [true, "User is required"],
     },
+    date: {
+        type: Date,
+        default: Date.now,
+    },
+    
 }, {timestamps: true});
 
 const Blog = models.Blog || model("Blog", BlogSchema);
