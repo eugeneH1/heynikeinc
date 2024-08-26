@@ -38,3 +38,4 @@ export async function POST(
     return NextResponse.json({ message: "Error adding comment" }, { status: 500 });
   }
 }
+

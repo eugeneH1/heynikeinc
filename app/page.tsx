@@ -1,6 +1,8 @@
 'use client'
 import Image from "next/image";
-import Blog2 from "./components/blog2";
+import Blog2 from "./components/Blog";
+import { Separator } from "@/components/ui/separator";
+import BlogPage from "./components/Blog";
 
 export default function Home() {
   return (
@@ -112,7 +114,8 @@ export default function Home() {
         </a>
       </div>
     </main>
-    <Blog2 />
+    <Separator />
+    <BlogPage />
     </>
   );
 }
