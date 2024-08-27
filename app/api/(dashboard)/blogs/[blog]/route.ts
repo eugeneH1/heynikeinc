@@ -60,3 +60,29 @@ export async function PATCH(
       return NextResponse.json({ message: "Error updating blog" }, { status: 500 });
     }
   }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { blog: string } }
+) {
+  const blogId = params.blog;
+  try {
+    if (!blogId || !Types.ObjectId.isValid(blogId)) {
+      return NextResponse.json({ message: "Invalid blog ID" }, { status: 400 });
+    }
+
+    await connect();
+
+    const deletedBlog = await Blog.findByIdAndDelete(blogId);
+
+    if (!deletedBlog) {
+      return NextResponse.json({ message: "Blog not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Blog deleted successfully" }, { status: 200 });
+
+  } catch (error) {
+    console.error("Error deleting blog:", error);
+    return NextResponse.json({ message: "Error deleting blog" }, { status: 500 });
+  }
+}
