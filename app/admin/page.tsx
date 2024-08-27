@@ -177,6 +177,15 @@ export default function Component() {
               </Button>
             </Link>
           )}
+
+          {activeTab === 'users' && (
+            <Link href="/admin/add-user">
+              <Button>
+                <PlusIcon className="mr-2" size={18} />
+                Add New User
+              </Button>
+            </Link>
+          )}
         </div>
 
         {isLoading && <p>Loading...</p>}

@@ -9,7 +9,7 @@ const userSchema = new Schema({
     username: {
         type: String,
         required: [true, "Username is required"],
-        match: [/^[a-zA-Z0-9]+$/, "Username is invalid"],
+        match: [/^[a-zA-Z0-9 ._-]+$/, "Username is invalid"],
     },
     password: {
         type: String,

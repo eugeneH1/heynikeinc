@@ -6,10 +6,13 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import Link from 'next/link'
+import { Heart } from 'lucide-react'
 
 interface Blog {
   _id: string;
   title: string;
+  description: string;
+  likes: number;
   category: { _id: string; title: string } | string;
   createdAt: string;
   excerpt: string;
@@ -104,12 +107,22 @@ export default function BlogPage() {
                   <CardTitle className="text-2xl">{blog.title}</CardTitle>
                   <Badge>{typeof blog.category === 'object' ? blog.category.title : blog.category}</Badge>
                 </div>
+                {/* Add the description here */}
+                <p className="text-muted-foreground mt-2">{blog.description}</p>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-4">{blog.excerpt}</p>
-                <Link href={`/${blog._id}/blog`} passHref>
-                  <Button variant="outline">Read More</Button>
-                </Link>
+                <div className="flex justify-between items-center">
+                  <Link href={`/${blog._id}/blog`} passHref>
+                    <Button variant="outline">Read More</Button>
+                  </Link>
+                  {/* Add the likes count here */}
+                  <div className="flex items-center">
+                    <Heart className="w-4 h-4 mr-1" />
+                    {/* <HandThumbsUp className="w-4 h-4 mr-1" /> */}
+                    <span>{blog.likes || 0}</span>
+                  </div>
+                </div>
               </CardContent>
               <CardFooter className="flex justify-between items-center">
                 <p className="text-sm text-muted-foreground">By {blog.user.username}</p>
