@@ -78,9 +78,9 @@ export default function Component() {
         const blogsResponse = await fetch('/api/(dashboard)/blogs')
         const blogsData = await blogsResponse.json()
         const blogs = Array.isArray(blogsData) ? blogsData : (blogsData.blogs || [])
-        
+        console.log(blogs)
         // Collect all comments from all blogs
-        const allComments = blogs.flatMap(blog => blog.comments || [])
+        const allComments = blogs.flatMap((blog: Blog) => blog.comments || [])
         setComments(allComments)
       }
     } catch (error) {

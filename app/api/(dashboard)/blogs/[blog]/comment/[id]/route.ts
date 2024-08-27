@@ -5,9 +5,11 @@ import Blog from "@/lib/models/blog";
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { blog: string; commentId: string } }
+  { params }: { params: { blog: string; id: string } }
 ) {
-  const { blog: blogId, commentId } = params;
+  const blogId = params.blog;
+  const commentId = params.id;
+
   try {
     if (!blogId || !Types.ObjectId.isValid(blogId) || !commentId || !Types.ObjectId.isValid(commentId)) {
       return NextResponse.json({ message: "Invalid blog ID or comment ID" }, { status: 400 });
@@ -22,7 +24,7 @@ export async function DELETE(
     );
 
     if (!updatedBlog) {
-      return NextResponse.json({ message: "Blog not found" }, { status: 404 });
+      return NextResponse.json({ message: "Blog not found or comment not deleted" }, { status: 404 });
     }
 
     return NextResponse.json({ message: "Comment deleted successfully" }, { status: 200 });
