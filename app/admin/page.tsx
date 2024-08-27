@@ -75,7 +75,7 @@ export default function Component() {
         }
       } else if (activeTab === 'comments') {
         // Fetch all blogs to get their comments
-        const blogsResponse = await fetch('/api/(dashboard)/blogs')
+        const blogsResponse = await fetch('/api/blogs')
         const blogsData = await blogsResponse.json()
         const blogs = Array.isArray(blogsData) ? blogsData : (blogsData.blogs || [])
         console.log(blogs)
@@ -249,6 +249,7 @@ export default function Component() {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Blog Title</TableHead>
                 <TableHead>Author</TableHead>
                 <TableHead>Content</TableHead>
                 <TableHead>Date</TableHead>
@@ -256,19 +257,26 @@ export default function Component() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {comments.map((comment) => (
-                <TableRow key={comment._id}>
-                  <TableCell>{comment.author}</TableCell>
-                  <TableCell>{comment.content}</TableCell>
-                  <TableCell>{new Date(comment.createdAt).toLocaleDateString()}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => handleDelete(comment._id, comment.blogId)}>
-                      <TrashIcon className="h-4 w-4" />
-                      <span className="sr-only">Delete</span>
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {blogs.flatMap(blog => 
+                blog.comments.map(comment => (
+                  <TableRow key={`${blog._id}-${comment._id}`}>
+                    <TableCell>{blog.title}</TableCell>
+                    <TableCell>{comment.author}</TableCell>
+                    <TableCell>{comment.content}</TableCell>
+                    <TableCell>{new Date(comment.createdAt).toLocaleDateString()}</TableCell>
+                    <TableCell className="text-right">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={() => handleDelete(comment._id, blog._id)}
+                      >
+                        <TrashIcon className="h-4 w-4" />
+                        <span className="sr-only">Delete</span>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         )}
