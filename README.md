@@ -1,5 +1,5 @@
 TODO:
-- [ ] Add dark mode
+- [ ] Add dark mode NB: use a new branch!
 - [ ] Finish editing page for blog posts
 - [ ] Navigation
-- [ ] Add a blog post comment reply reply
+- [ ] Use hero icons on admin dashboard
