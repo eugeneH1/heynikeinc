@@ -14,10 +14,10 @@ export function TextRevealCardPreview() {
         revealText="We know the law "
       >
         <TextRevealCardTitle>
-          Sometimes, you just need to see call.
+          Sometimes, you just need to call.
         </TextRevealCardTitle>
         <TextRevealCardDescription>
-         But if you don't want to fill out the form below.
+         But if you don't want to, fill out the form below.
         </TextRevealCardDescription>
       </TextRevealCard>
     </div>
