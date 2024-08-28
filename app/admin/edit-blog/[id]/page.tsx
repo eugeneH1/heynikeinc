@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -51,7 +51,7 @@ export default function EditBlog() {
     }
   };
 
-  const fetchBlogData = async () => {
+  const fetchBlogData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
@@ -77,7 +77,7 @@ export default function EditBlog() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [blogId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,6 +1,6 @@
 'use client'
 import { unstable_noStore as noStore } from 'next/cache';
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -48,11 +48,7 @@ export default function Component() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    fetchData()
-  }, [activeTab])
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     noStore();
     setIsLoading(true)
     setError(null)
@@ -89,7 +85,11 @@ export default function Component() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [activeTab]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleDelete = async (id: string, blogId?: string) => {
     noStore();

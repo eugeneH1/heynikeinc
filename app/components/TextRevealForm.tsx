@@ -17,7 +17,7 @@ export function TextRevealCardPreview() {
           Sometimes, you just need to call.
         </TextRevealCardTitle>
         <TextRevealCardDescription>
-         But if you don't want to, fill out the form below.
+         But if you don&apos;t want to, fill out the form below.
         </TextRevealCardDescription>
       </TextRevealCard>
     </div>
